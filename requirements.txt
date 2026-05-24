@@ -2,3 +2,6 @@ requests
 colorama
 phonenumbers
 dnspython
+flask
+reportlab
+webbrowser
