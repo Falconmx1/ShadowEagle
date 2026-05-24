@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ShadowEagle Web</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <style>
+        #map { height: 400px; margin-top: 20px; }
+        body { font-family: monospace; background: black; color: #0f0; padding: 20px; }
+        input, button { background: #222; color: #0f0; border: 1px solid #0f0; padding: 8px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🦅 ShadowEagle Web Interface</h1>
+    <input type="text" id="ipInput" placeholder="IP a trackear">
+    <button onclick="trackIP()">Track IP</button>
+    <div id="map"></div>
+    <div id="info"></div>
+    <script>
+        let map;
+        function trackIP() {
+            let ip = document.getElementById('ipInput').value;
+            fetch('/track_ip', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ip: ip})
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(map) map.remove();
+                map = L.map('map').setView([data.lat, data.lon], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+                L.marker([data.lat, data.lon]).addTo(map).bindPopup(`${data.query}<br>${data.city}, ${data.country}`);
+                document.getElementById('info').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            });
+        }
+    </script>
+</body>
+</html>
